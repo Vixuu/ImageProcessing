@@ -64,6 +64,9 @@ func main() {
 
 	start := time.Now()
 
+	os.MkdirAll("output/hist", os.ModePerm)
+
+
 	// Wczytanie obrazu
 	img, err := LoadImage("input.jpg")
 	if err != nil {
