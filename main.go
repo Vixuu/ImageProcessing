@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"log"
 	"os"
 	"time"
 	"zadanie/1/internal/binarize"
 	"zadanie/1/internal/flip"
 	"zadanie/1/internal/grayscale"
+	"zadanie/1/internal/histogram"
 	"zadanie/1/internal/hsl"
 	"zadanie/1/internal/invert"
 	"zadanie/1/internal/reduce"
@@ -148,6 +150,15 @@ func main() {
 	if err != nil {
 		fmt.Println("Error saving resized image:", err)
 	}
+
+	err = histogram.GenerateHistogram("input.jpg", "jasnosc", "output/hist")
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = histogram.GenerateHistogram("input.jpg", "rgb", "output/hist")
+    if err != nil {
+        log.Fatal(err)
+    }
 
 	end := time.Since(start)
 	fmt.Printf("Processing time: %s\n", end.Round(time.Millisecond))
