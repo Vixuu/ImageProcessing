@@ -1,4 +1,4 @@
-module zadanie/1
+module image-processing/v1
 
 go 1.23.4
 

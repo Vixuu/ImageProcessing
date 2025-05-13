@@ -3,7 +3,7 @@ package binarize
 import (
 	"image"
 	"image/color"
-	"zadanie/1/internal/grayscale"
+	"image-processing/v1/internal/grayscale"
 )
 
 func BinarizeColor(r, g, b uint8, threshold uint8) uint8 {
