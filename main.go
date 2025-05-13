@@ -154,6 +154,12 @@ func main() {
 		fmt.Println("Error saving resized image:", err)
 	}
 
+	resized := scale.ResizeImageBilinear(img, 800, 600)
+	err = SaveImage(resized, "output/resized_bilinear.jpg")
+	if err != nil {
+		fmt.Println("Error saving resized bilinear image:", err)
+	}
+
 	err = histogram.GenerateHistogram("input.jpg", "jasnosc", "output/hist")
 	if err != nil {
 		log.Fatal(err)
