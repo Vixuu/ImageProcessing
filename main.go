@@ -3,11 +3,8 @@ package main
 import (
 	"fmt"
 	"image"
-	"image/jpeg"
-	"log"
-	"os"
-	"time"
 	"image-processing/v1/internal/binarize"
+	"image-processing/v1/internal/convolution"
 	"image-processing/v1/internal/flip"
 	"image-processing/v1/internal/grayscale"
 	"image-processing/v1/internal/histogram"
@@ -16,6 +13,10 @@ import (
 	"image-processing/v1/internal/reduce"
 	"image-processing/v1/internal/rotate"
 	"image-processing/v1/internal/scale"
+	"image/jpeg"
+	"log"
+	"os"
+	"time"
 )
 
 // LoadImage loads an image from a file
@@ -160,6 +161,7 @@ func main() {
 		fmt.Println("Error saving resized bilinear image:", err)
 	}
 
+	// Generate histograms
 	err = histogram.GenerateHistogram("input.jpg", "jasnosc", "output/hist")
 	if err != nil {
 		log.Fatal(err)
@@ -168,6 +170,22 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
+
+	// Convolution
+	grayMatrix := convolution.ConvertToGrayMatrix(img)
+    kernel := [][]float64{
+        {-1, -1, -1},
+        {0, 0, 0},
+        {1, 1, 1},
+    }
+	result := convolution.Convolve(grayMatrix, kernel, convolution.Replicate)
+    outImg := convolution.ConvertGrayMatrixToImage(result)
+
+	err = SaveImage(outImg, "output/convolution.jpg")
+	if err != nil {
+		fmt.Println("Error saving convolved image:", err)
+		return
+	}
 
 	end := time.Since(start)
 	fmt.Printf("Processing time: %s\n", end.Round(time.Millisecond))
