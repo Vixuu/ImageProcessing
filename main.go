@@ -67,7 +67,6 @@ func main() {
 
 	os.MkdirAll("output/hist", os.ModePerm)
 
-
 	// Wczytanie obrazu
 	img, err := LoadImage("input.jpg")
 	if err != nil {
@@ -167,21 +166,44 @@ func main() {
 		log.Fatal(err)
 	}
 	err = histogram.GenerateHistogram("input.jpg", "rgb", "output/hist")
-    if err != nil {
-        log.Fatal(err)
-    }
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Convolution
 	grayMatrix := convolution.ConvertToGrayMatrix(img)
-    kernel := [][]float64{
-        {-1, -1, -1},
-        {0, 0, 0},
-        {1, 1, 1},
-    }
-	result := convolution.Convolve(grayMatrix, kernel, convolution.Replicate)
-    outImg := convolution.ConvertGrayMatrixToImage(result)
+	kernel := [][]float64{
+		{1, 0, -1},
+		{2, 0, -2},
+		{1, 0, -1},
+	}
+	result := convolution.Convolve(grayMatrix, kernel, convolution.None)
+	outImg := convolution.ConvertGrayMatrixToImage(result)
 
-	err = SaveImage(outImg, "output/convolution.jpg")
+	err = SaveImage(outImg, "output/conv_sobel_vert.jpg")
+	if err != nil {
+		fmt.Println("Error saving convolved image:", err)
+		return
+	}
+
+	kernel = [][]float64{
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+	}
+	result = convolution.Convolve(grayMatrix, kernel, convolution.Replicate)
+	outImg = convolution.ConvertGrayMatrixToImage(result)
+
+	err = SaveImage(outImg, "output/conv_blur.jpg")
 	if err != nil {
 		fmt.Println("Error saving convolved image:", err)
 		return
