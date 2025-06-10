@@ -10,6 +10,7 @@ import (
 	"image-processing/v1/internal/histogram"
 	"image-processing/v1/internal/hsl"
 	"image-processing/v1/internal/invert"
+	"image-processing/v1/internal/morphology"
 	"image-processing/v1/internal/reduce"
 	"image-processing/v1/internal/rotate"
 	"image-processing/v1/internal/scale"
@@ -66,6 +67,7 @@ func main() {
 	start := time.Now()
 
 	os.MkdirAll("output/hist", os.ModePerm)
+	os.MkdirAll("output/morphology", os.ModePerm)
 
 	// Wczytanie obrazu
 	img, err := LoadImage("input.jpg")
@@ -206,6 +208,81 @@ func main() {
 	err = SaveImage(outImg, "output/conv_blur.jpg")
 	if err != nil {
 		fmt.Println("Error saving convolved image:", err)
+		return
+	}
+
+	// Morphology operations
+
+	imgMorphology, err := LoadImage("x.png")
+	if err != nil {
+		fmt.Println("Error loading image:", err)
+		return
+	}
+
+	// Erosion and Dilation
+	morphologyKernel := [][]int{
+		{1, 1, 1},
+		{1, 1, 1},
+		{1, 1, 1},
+	}
+
+	bin := morphology.ImageToBinaryMatrix(imgMorphology, 127)
+	eroded := morphology.Erode(bin, morphologyKernel)
+	dilated := morphology.Dilate(bin, morphologyKernel)
+	erodedImg := morphology.BinaryMatrixToImage(eroded)
+	dilatedImg := morphology.BinaryMatrixToImage(dilated)
+	err = SaveImage(erodedImg, "output/morphology/eroded.jpg")
+	if err != nil {
+		fmt.Println("Error saving eroded image:", err)
+		return
+	}
+	err = SaveImage(dilatedImg, "output/morphology/dilated.jpg")
+	if err != nil {
+		fmt.Println("Error saving dilated image:", err)
+		return
+	}
+
+	// Opening and Closing
+	opening := morphology.Open(bin, morphologyKernel)
+	closing := morphology.Close(bin, morphologyKernel)
+	openingImg := morphology.BinaryMatrixToImage(opening)
+	closingImg := morphology.BinaryMatrixToImage(closing)
+	err = SaveImage(openingImg, "output/morphology/opening.jpg")
+	if err != nil {
+		fmt.Println("Error saving opening image:", err)
+		return
+	}
+	err = SaveImage(closingImg, "output/morphology/closing.jpg")
+	if err != nil {
+		fmt.Println("Error saving closing image:", err)
+		return
+	}
+	// Hit-or-Miss Transform
+	hit := [][]int{
+		{0, 1, 0},
+		{1, 1, 1},
+		{0, 1, 0},
+	}
+	miss := [][]int{
+		{1, 0, 1},
+		{0, 0, 0},
+		{1, 0, 1},
+	}
+	out := morphology.HitOrMiss(bin, hit, miss)
+	hitOrMissImg := morphology.BinaryMatrixToImage(out)
+
+	err = SaveImage(hitOrMissImg, "output/morphology/hit_or_miss.jpg")
+	if err != nil {
+		fmt.Println("Error saving hit-or-miss image:", err)
+		return
+	}
+
+	//Skeletonization
+	skeleton := morphology.Skeletonize(bin, morphologyKernel)
+	skeletonImg := morphology.BinaryMatrixToImage(skeleton)
+	err = SaveImage(skeletonImg, "output/morphology/skeleton.jpg")
+	if err != nil {
+		fmt.Println("Error saving skeleton image:", err)
 		return
 	}
 
